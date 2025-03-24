@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tone Perfect Grey &amp; Gaussian Noise Grey Wallpaper Generator</title>
+    <meta name="description"
+          content="Generate tone perfect grey or Gaussian noise grey wallpapers with our tool. Perfect for minimalist design, testing displays, and reducing eye strain.">
+    <meta name="keywords"
+          content="grey wallpaper, tone perfect grey, gaussian noise grey, wallpaper generator, minimalism">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Tone Perfect Grey &amp; Gaussian Noise Grey Wallpaper Generator">
+    <meta property="og:description"
+          content="Generate tone perfect grey or Gaussian noise grey wallpapers with our tool. Perfect for minimalist design, testing displays, and reducing eye strain.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://wallpapers.mprlab.com">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Tone Perfect Grey &amp; Gaussian Noise Grey Wallpaper Generator">
+    <meta name="twitter:description"
+          content="Generate tone perfect grey or Gaussian noise grey wallpapers with our tool. Perfect for minimalist design, testing displays, and reducing eye strain.">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Tone Perfect Grey & Gaussian Noise Grey Wallpaper Generator",
+            "description": "Generate tone perfect grey or Gaussian noise grey wallpapers with our tool. Perfect for minimalist design, testing displays, and reducing eye strain.",
+            "url": "https://wallpapers.mprlab.com"
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            display: block;
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<h1>Tone Perfect Grey &amp; Gaussian Noise Grey Wallpaper Generator</h1>
+
+<label for="mode">Select Mode:</label>
+<select id="mode">
+    <option value="solid">Tone Perfect Grey</option>
+    <option value="noise">Gaussian Noise Grey</option>
+</select>
+
+<button id="generateButton">Generate Wallpaper</button>
+<button id="downloadButton" style="display: none;">Download Wallpaper</button>
+
+<canvas id="wallpaperCanvas"></canvas>
+
+<script>
+    // Auto-detect physical resolution using devicePixelRatio.
+    const devicePixelRatioValue = window.devicePixelRatio || 1;
+    const detectedWidth = Math.round(screen.width * devicePixelRatioValue);
+    const detectedHeight = Math.round(screen.height * devicePixelRatioValue);
+
+    const canvas = document.getElementById("wallpaperCanvas");
+    const generateButton = document.getElementById("generateButton");
+    const downloadButton = document.getElementById("downloadButton");
+    const modeSelect = document.getElementById("mode");
+
+    generateButton.addEventListener("click", () => {
+        // Set canvas to physical resolution.
+        canvas.width = detectedWidth;
+        canvas.height = detectedHeight;
+        // Optionally, adjust display size if desired:
+        canvas.style.width = (detectedWidth / devicePixelRatioValue) + "px";
+        canvas.style.height = (detectedHeight / devicePixelRatioValue) + "px";
+
+        const context = canvas.getContext("2d");
+        const imageData = context.createImageData(detectedWidth, detectedHeight);
+        const data = imageData.data;
+        const mode = modeSelect.value;
+
+        for (let coordinateY = 0; coordinateY < detectedHeight; coordinateY++) {
+            for (let coordinateX = 0; coordinateX < detectedWidth; coordinateX++) {
+                const pixelIndex = (coordinateY * detectedWidth + coordinateX) * 4;
+                let greyValue = 128; // tone perfect grey
+                if (mode === "noise") {
+                    greyValue = gaussianRandom(128, 20);
+                }
+                data[pixelIndex] = greyValue;       // Red
+                data[pixelIndex + 1] = greyValue;   // Green
+                data[pixelIndex + 2] = greyValue;   // Blue
+                data[pixelIndex + 3] = 255;         // Alpha
+            }
+        }
+
+        context.putImageData(imageData, 0, 0);
+        downloadButton.style.display = "inline-block";
+    });
+
+    function gaussianRandom(mean, stdDev) {
+        let uniformOne = Math.random();
+        let uniformTwo = Math.random();
+        const normal = Math.sqrt(-2 * Math.log(uniformOne)) * Math.cos(2 * Math.PI * uniformTwo);
+        let value = mean + stdDev * normal;
+        value = Math.max(0, Math.min(255, value));
+        return Math.round(value);
+    }
+
+    downloadButton.addEventListener("click", () => {
+        const imageURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = imageURL;
+        link.download = "wallpaper.png";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+</script>
+</body>
+</html>
