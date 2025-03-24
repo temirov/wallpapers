@@ -2,40 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Grey Wallpaper Generator</title>
+    <title>Grey & Pink & White Wallpaper Generator</title>
     <meta name="description"
-          content="Generate tone perfect grey or Gaussian noise grey wallpapers — now with tone perfect pink and pink‑noise options. Perfect for minimalist design, testing displays, and reducing eye strain.">
+          content="Generate tone perfect grey, Gaussian noise grey, tone perfect pink, pink noise, pure white or white noise wallpapers. Perfect for minimalist design, testing displays, and reducing eye strain.">
     <meta name="keywords"
-          content="grey wallpaper,pink wallpaper,tone perfect grey,gaussian noise grey,tone perfect pink,pink noise,wallpaper generator,minimalism">
+          content="grey wallpaper,pink wallpaper,white wallpaper,tone perfect grey,gaussian noise grey,tone perfect pink,pink noise,white noise,wallpaper generator,minimalism">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:title" content="Tone Perfect Grey &amp; Pink Wallpaper Generator">
+    <meta property="og:title" content="Tone Perfect Wallpaper Generator">
     <meta property="og:description"
-          content="Generate tone perfect grey or Gaussian noise grey wallpapers — now with tone perfect pink and pink‑noise options.">
+          content="Generate tone perfect grey, Gaussian noise grey, tone perfect pink, pink noise, pure white or white noise wallpapers.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://wallpapers.mprlab.com">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Tone Perfect Grey &amp; Pink Wallpaper Generator">
+    <meta name="twitter:title" content="Tone Perfect Wallpaper Generator">
     <meta name="twitter:description"
-          content="Generate tone perfect grey or Gaussian noise grey wallpapers — now with tone perfect pink and pink‑noise options.">
+          content="Generate tone perfect grey, Gaussian noise grey, tone perfect pink, pink noise, pure white or white noise wallpapers.">
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "Tone Perfect Grey & Pink Wallpaper Generator",
-            "description": "Generate tone perfect grey or Gaussian noise grey wallpapers — now with tone perfect pink and pink‑noise options.",
+            "name": "Tone Perfect Wallpaper Generator",
+            "description": "Generate tone perfect grey, Gaussian noise grey, tone perfect pink, pink noise, pure white or white noise wallpapers.",
             "url": "https://wallpapers.mprlab.com"
         }
     </script>
 
     <!-- Latest Bootstrap CSS (v5.3.0) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
         canvas { border:1px solid #ccc; width:100%; height:auto }
         .card { margin-bottom:20px }
@@ -43,7 +42,7 @@
 </head>
 <body>
 <div class="container my-4">
-    <h1 class="mb-4 text-center">Grey & Pink Wallpaper Generator</h1>
+    <h1 class="mb-4 text-center">Wallpaper Generator</h1>
 
     <div class="row">
         <!-- Tone Perfect Grey -->
@@ -101,6 +100,34 @@
                 </div>
             </div>
         </div>
+
+        <!-- Tone Perfect White -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-center">Tone Perfect White</div>
+                <div class="card-body">
+                    <canvas id="previewWhiteSolid"></canvas>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <button id="downloadWhiteSolid" class="btn btn-primary">Download Full Resolution</button>
+                        <span class="text-muted small" id="resolutionTextWhiteSolid"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- White Noise -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-center">White Noise</div>
+                <div class="card-body">
+                    <canvas id="previewWhiteNoise"></canvas>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <button id="downloadWhiteNoise" class="btn btn-primary">Download Full Resolution</button>
+                        <span class="text-muted small" id="resolutionTextWhiteNoise"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="text-center">
@@ -116,84 +143,93 @@
     const previewWidth = 300;
     const previewHeight = Math.round(previewWidth * fullHeight / fullWidth);
 
-    document.getElementById('resolutionTextSolid').textContent = `${fullWidth} × ${fullHeight}`;
-    document.getElementById('resolutionTextNoise').textContent = `${fullWidth} × ${fullHeight}`;
-    document.getElementById('resolutionTextPinkSolid').textContent = `${fullWidth} × ${fullHeight}`;
-    document.getElementById('resolutionTextPinkNoise').textContent = `${fullWidth} × ${fullHeight}`;
+    ['Solid','Noise','PinkSolid','PinkNoise','WhiteSolid','WhiteNoise'].forEach(id => {
+        document.getElementById('resolutionText'+id).textContent = `${fullWidth} × ${fullHeight}`;
+    });
 
     let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    function pinkRandom() {
+        const white = Math.random()*2 - 1;
+        b0 = 0.99886*b0 + white*0.0555179;
+        b1 = 0.99332*b1 + white*0.0750759;
+        b2 = 0.96900*b2 + white*0.1538520;
+        b3 = 0.86650*b3 + white*0.3104856;
+        b4 = 0.55000*b4 + white*0.5329522;
+        b5 = -0.7616*b5 - white*0.0168980;
+        const pink = b0+b1+b2+b3+b4+b5+b6 + white*0.5362;
+        b6 = white*0.115926;
+        return Math.max(-1, Math.min(1, pink*0.11));
+    }
 
-    function gaussianRandom(mean,std) {
+    function gaussianRandom(mean, std) {
         const u1=Math.random(),u2=Math.random();
         const z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
         return Math.round(Math.max(0,Math.min(255,mean+std*z)));
     }
 
-    function pinkRandom() {
-        const white=Math.random()*2-1;
-        b0=0.99886*b0+white*0.0555179;
-        b1=0.99332*b1+white*0.0750759;
-        b2=0.96900*b2+white*0.1538520;
-        b3=0.86650*b3+white*0.3104856;
-        b4=0.55000*b4+white*0.5329522;
-        b5=-0.7616*b5-white*0.0168980;
-        const pink=b0+b1+b2+b3+b4+b5+b6+white*0.5362;
-        b6=white*0.115926;
-        return Math.max(-1,Math.min(1,pink*0.11));
-    }
-
     function generateImage(canvas,w,h,mode) {
         canvas.width=w; canvas.height=h;
-        const ctx=canvas.getContext('2d');
-        const img=ctx.createImageData(w,h);
-        const d=img.data;
+        const ctx = canvas.getContext('2d');
+        const img = ctx.createImageData(w,h);
+        const data = img.data;
+
         for(let y=0;y<h;y++){
             for(let x=0;x<w;x++){
                 const i=(y*w+x)*4;
                 let r,g,b;
-                if(mode==='solid'){ r=g=b=128 }
-                else if(mode==='noise'){ r=g=b=gaussianRandom(128,20) }
-                else if(mode==='pink-solid'){ r=255; g=192; b=203 }
-                else {
-                    const offset=pinkRandom()*30;
-                    r=Math.round(Math.max(0,Math.min(255,255+offset)));
-                    g=Math.round(Math.max(0,Math.min(255,192+offset)));
-                    b=Math.round(Math.max(0,Math.min(255,203+offset)));
+                switch(mode) {
+                    case 'solid': r=g=b=128; break;
+                    case 'noise': r=g=b=gaussianRandom(128,20); break;
+                    case 'pink-solid': r=255; g=192; b=203; break;
+                    case 'pink-noise': {
+                        const offset=pinkRandom()*30;
+                        r=Math.round(Math.max(0,Math.min(255,255+offset)));
+                        g=Math.round(Math.max(0,Math.min(255,192+offset)));
+                        b=Math.round(Math.max(0,Math.min(255,203+offset)));
+                    } break;
+                    case 'white-solid': r=g=b=255; break;
+                    case 'white-noise': r=g=b=Math.floor(Math.random()*256); break;
                 }
-                d[i]=r; d[i+1]=g; d[i+2]=b; d[i+3]=255;
+                data[i]=r; data[i+1]=g; data[i+2]=b; data[i+3]=255;
             }
         }
         ctx.putImageData(img,0,0);
     }
 
     function regeneratePreviews() {
-        generateImage(document.getElementById('previewSolid'),previewWidth,previewHeight,'solid');
-        generateImage(document.getElementById('previewNoise'),previewWidth,previewHeight,'noise');
-        generateImage(document.getElementById('previewPinkSolid'),previewWidth,previewHeight,'pink-solid');
-        generateImage(document.getElementById('previewPinkNoise'),previewWidth,previewHeight,'pink-noise');
+        generateImage(document.getElementById('previewSolid'), previewWidth, previewHeight, 'solid');
+        generateImage(document.getElementById('previewNoise'), previewWidth, previewHeight, 'noise');
+        generateImage(document.getElementById('previewPinkSolid'), previewWidth, previewHeight, 'pink-solid');
+        generateImage(document.getElementById('previewPinkNoise'), previewWidth, previewHeight, 'pink-noise');
+        generateImage(document.getElementById('previewWhiteSolid'), previewWidth, previewHeight, 'white-solid');
+        generateImage(document.getElementById('previewWhiteNoise'), previewWidth, previewHeight, 'white-noise');
     }
 
     function downloadFullResolution(mode) {
-        const off=document.createElement('canvas');
-        generateImage(off,fullWidth,fullHeight,mode);
-        const link=document.createElement('a');
-        link.href=off.toDataURL('image/png');
+        const off = document.createElement('canvas');
+        generateImage(off, fullWidth, fullHeight, mode);
+        const link = document.createElement('a');
+        link.href = off.toDataURL('image/png');
         link.download = {
             'solid':'tone-perfect-grey.png',
             'noise':'gaussian-noise-grey.png',
             'pink-solid':'tone-perfect-pink.png',
-            'pink-noise':'pink-noise.png'
+            'pink-noise':'pink-noise.png',
+            'white-solid':'tone-perfect-white.png',
+            'white-noise':'white-noise.png'
         }[mode];
         document.body.appendChild(link);
         link.click();
         link.remove();
     }
 
-    document.getElementById('regeneratePreviews').onclick=regeneratePreviews;
-    document.getElementById('downloadSolid').onclick=()=>downloadFullResolution('solid');
-    document.getElementById('downloadNoise').onclick=()=>downloadFullResolution('noise');
-    document.getElementById('downloadPinkSolid').onclick=()=>downloadFullResolution('pink-solid');
-    document.getElementById('downloadPinkNoise').onclick=()=>downloadFullResolution('pink-noise');
+    document.getElementById('regeneratePreviews').onclick = regeneratePreviews;
+    document.getElementById('downloadSolid').onclick = ()=>downloadFullResolution('solid');
+    document.getElementById('downloadNoise').onclick = ()=>downloadFullResolution('noise');
+    document.getElementById('downloadPinkSolid').onclick = ()=>downloadFullResolution('pink-solid');
+    document.getElementById('downloadPinkNoise').onclick = ()=>downloadFullResolution('pink-noise');
+    document.getElementById('downloadWhiteSolid').onclick = ()=>downloadFullResolution('white-solid');
+    document.getElementById('downloadWhiteNoise').onclick = ()=>downloadFullResolution('white-noise');
 
     regeneratePreviews();
 </script>
